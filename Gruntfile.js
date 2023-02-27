@@ -9,7 +9,11 @@ module.exports = function(grunt) {
       },
       combine: {
         files: {
-        'dist/mapml.css': ['node_modules/leaflet/dist/leaflet.css', 'src/mapml.css']
+        'dist/mapml.css': ['node_modules/leaflet/dist/leaflet.css',
+                           'node_modules/leaflet-distortableimage/dist/vendor.css',
+                           'node_modules/leaflet-distortableimage/dist/leaflet.distortableimage.css',
+                           'node_modules/leaflet-toolbar/dist/leaflet.toolbar.css',
+                           'src/mapml.css']
         }
       }
     },
@@ -26,6 +30,7 @@ module.exports = function(grunt) {
           'dist/web-map.js':      ['src/web-map.js'],
           'dist/mapml-viewer.js': ['src/mapml-viewer.js'],
           'dist/map-caption.js':  ['src/map-caption.js'],
+          'dist/map-img.js':      ['src/map-img.js'],
           'dist/map-area.js':     ['src/map-area.js'],
           'dist/layer.js':        ['src/layer.js'],
           'dist/leaflet.js':      ['dist/leaflet-src.js',
@@ -78,6 +83,22 @@ module.exports = function(grunt) {
             flatten: true,
             filter: 'isFile',
             src: ['proj4leaflet.js'],
+            dest: 'dist/'
+          },
+          {
+            expand: true,
+            cwd: 'node_modules/leaflet-distortableimage/dist/',
+            flatten: true,
+            filter: 'isFile',
+            src: ['leaflet.distortableimage.js'],
+            dest: 'dist/'
+          },
+          {
+            expand: true,
+            cwd: 'node_modules/leaflet-toolbar/dist/',
+            flatten: true,
+            filter: 'isFile',
+            src: ['leaflet.toolbar.js'],
             dest: 'dist/'
           },
           {
