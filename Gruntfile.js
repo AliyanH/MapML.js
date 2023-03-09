@@ -124,11 +124,24 @@ module.exports = function(grunt) {
             dest: 'dist/images/'
           }
         ]
+      },
+      experiments: {
+        files: [
+          {
+            expand: true,
+            src: ['dist/*'],
+            dest: '../experiments'
+      }
+        ]
       }
     },
     clean: {
       dist: ['dist'],
-      tidyup: ['dist/leaflet-src.js','dist/proj4-src.js','dist/proj4leaflet.js']
+      tidyup: ['dist/leaflet-src.js','dist/proj4-src.js','dist/proj4leaflet.js'],
+      experiments: {
+        options: {force: true},
+        src: ['../experiments/dist']
+      }
     },
     rollup: {
       options: {
@@ -152,5 +165,6 @@ module.exports = function(grunt) {
   grunt.registerTask('test', ['jshint']);
   grunt.registerTask('default', ['clean:dist', 'copy', 'jshint', 'rollup', 
                                  'uglify', 'cssmin','clean:tidyup']);
+  grunt.registerTask('experiments',['clean:experiments','default','copy:experiments']);
 
 };
