@@ -71,20 +71,46 @@ export class MapExtent extends HTMLElement {
     if(this.querySelector('map-link[rel=query], map-link[rel=features]') && !this.shadowRoot) {
       this.attachShadow({mode: 'open'});
     }
-    let parentLayer = this.parentNode.nodeName.toUpperCase() === "LAYER-" ? this.parentNode : this.parentNode.host;
-    if (!parentLayer._layer) {
+    this.parentLayer = this.parentNode.nodeName.toUpperCase() === "LAYER-" ? this.parentNode : this.parentNode.host;
+    if (!this.parentLayer._layer) {
       // for custom projection cases, the MapMLLayer has not yet created and binded with the layer- at this point,
       // because the "createMap" event of mapml-viewer has not yet been dispatched, the map has not yet been created 
       // the event will be dispatched after defineCustomProjection > projection setter
       // should wait until MapMLLayer is built
-      parentLayer.parentNode.addEventListener('createmap', (e) => {
-        this._layer = parentLayer._layer;
+      this.parentLayer.parentNode.addEventListener('createmap', (e) => {
+        this._onConnect();
       });
     } else {
-      this._layer = parentLayer._layer;
+      this._onConnect();
     }
+  }
+  _onConnect() {
+    this._layer = this.parentLayer._layer;
+    this.getInputs();
   }
   disconnectedCallback() {
     
+  }
+  // gather all inputs from child map-input's
+  getInputs() {
+    let inpObj = {}; // return object
+    let inputs = this.querySelectorAll('map-input');
+    console.log(inputs); // DEBUG
+    for (let i = 0; i < inputs.length; i++) {
+      console.log(inputs[i]); // DEBUG
+      let type = inputs[i].getAttribute("type");
+      switch(type) {
+        case "zoom":
+          break;
+        case "location":
+          break;
+        case "width":
+          break;
+        case "height":
+          break;
+        case "hidden":
+          break;
+      }
+    }
   }
 }
