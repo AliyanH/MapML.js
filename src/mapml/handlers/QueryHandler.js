@@ -112,6 +112,17 @@ export var QueryHandler = L.Handler.extend({
             if (features.length)
               layer._mapmlFeatures = layer._mapmlFeatures.concat(features);
           } else {
+            // If GetFeatureInfo returns empty document, do not display popup
+            if (
+              response.text ===
+                'GetFeatureInfo results:\n\n  Search returned no results.\n' ||
+              !parser
+                .parseFromString(response.text, 'text/html')
+                .querySelector('body')
+                .innerHTML.trim().length
+            ) {
+              return Promise.reject({ message: 'No result' });
+            }
             // synthesize a single feature from text or html content
             let geom =
                 "<map-geometry cs='gcrs'><map-point><map-coordinates>" +
