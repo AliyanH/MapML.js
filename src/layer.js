@@ -249,6 +249,7 @@ export class MapLayer extends HTMLElement {
               }
             );
             this._createLayerControlHTML();
+            this.addFeatures();
             this._attachedToMap();
             this._validateDisabled();
             resolve();
@@ -274,6 +275,7 @@ export class MapLayer extends HTMLElement {
             opacity: this.opacity
           });
           this._createLayerControlHTML();
+          this.addFeatures();
           this._attachedToMap();
           this._validateDisabled();
           resolve();
@@ -290,6 +292,16 @@ export class MapLayer extends HTMLElement {
         );
       }
     });
+  }
+
+  addFeatures() {
+    let mapFeatures = this.shadowRoot
+      ? this.shadowRoot.querySelectorAll('map-feature')
+      : this.querySelectorAll('map-feature');
+
+    for (let i = 0; i < mapFeatures.length; i++) {
+      mapFeatures[i]._featureGroup.addTo(this.parentElement._map);
+    }
   }
 
   getBase() {

@@ -107,48 +107,76 @@ export class MapFeature extends HTMLElement {
       this.parentNode.nodeName.toUpperCase() === 'MAP-LINK'
         ? this.parentNode
         : this.parentNode.host;
-    this._parentEl.whenReady().then(() => {
-      this._layer = this._parentEl._layer || this._parentEl.parentExtent._layer;
-      delete this._parentEl.bounds;
-      if (
-        this._layer._layerEl.hasAttribute('data-moving') ||
-        this._parentEl.hasAttribute('data-moving')
-      )
-        return;
-      // if mapFeature element is not connected to layer- or layer-'s shadowroot,
-      // or the parent layer- element has a "data-moving" attribute
-      if (
-        (this.parentNode.nodeType !== document.DOCUMENT_FRAGMENT_NODE &&
-          this.parentNode.nodeName.toLowerCase() !== 'layer-') ||
-        (this.parentNode.nodeType === document.DOCUMENT_FRAGMENT_NODE &&
-          this.parentNode.host.hasAttribute('data-moving')) ||
-        (this.parentNode.nodeName.toLowerCase() === 'layer-' &&
-          this.parentNode.hasAttribute('data-moving'))
-      ) {
-        return;
-      }
-      // set up the map-feature object properties
-      this._addFeature();
-      // use observer to monitor the changes in mapFeature's subtree
-      // (i.e. map-properties, map-featurecaption, map-coordinates)
-      this._observer = new MutationObserver((mutationList) => {
-        for (let mutation of mutationList) {
-          // the attributes changes of <map-feature> element should be handled by attributeChangedCallback()
-          if (mutation.type === 'attributes' && mutation.target === this) {
-            return;
-          }
-          // re-render feature if there is any observed change
-          this._reRender();
-          delete this._parentEl.bounds;
+    let parentLayer =
+      this._parentEl.nodeName.toUpperCase() === 'LAYER-'
+        ? this._parentEl
+        : this._parentEl.parentElement || this._parentEl.parentNode.host;
+    delete this._parentEl.bounds;
+    if (
+      parentLayer.hasAttribute('data-moving') ||
+      this._parentEl.hasAttribute('data-moving')
+    )
+      return;
+    // if mapFeature element is not connected to layer- or layer-'s shadowroot,
+    // or the parent layer- element has a "data-moving" attribute
+    if (
+      (this.parentNode.nodeType !== document.DOCUMENT_FRAGMENT_NODE &&
+        this.parentNode.nodeName.toLowerCase() !== 'layer-') ||
+      (this.parentNode.nodeType === document.DOCUMENT_FRAGMENT_NODE &&
+        this.parentNode.host.hasAttribute('data-moving')) ||
+      (this.parentNode.nodeName.toLowerCase() === 'layer-' &&
+        this.parentNode.hasAttribute('data-moving'))
+    ) {
+      return;
+    }
+
+    // create map-feature Layer
+    if (!this.querySelector('map-geometry')) return;
+    let native = this._getNativeZoomAndCS(
+      parentLayer.shadowRoot ? parentLayer.shadowRoot : parentLayer
+    );
+    // should possibly rename _featureGroup to something more appropriate
+    this._featureGroup = M.featureLayer(this, {
+      renderer: M.featureRenderer(),
+      //pane: parentLayer._layer._container,
+      //opacity: parentLayer._layer.options.opacity,
+      projection: parentLayer.getProjection(),
+      native: M.getNativeVariables(parentLayer),
+      //_leafletLayer: parentLayer._layer,
+      //static: true,
+      mapEl: parentLayer.parentElement,
+      onEachFeature: function (properties, geometry) {
+        // need to parse as HTML to preserve semantics and styles
+        if (properties) {
+          var c = document.createElement('div');
+          c.classList.add('mapml-popup-content');
+          c.insertAdjacentHTML('afterbegin', properties.innerHTML);
+          geometry.bindPopup(c, { autoClose: false, minWidth: 165 });
         }
-      });
-      this._observer.observe(this, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeOldValue: true,
-        characterData: true
-      });
+      }
+    });
+
+    // set up the map-feature object properties
+    //this._addFeature();
+    // use observer to monitor the changes in mapFeature's subtree
+    // (i.e. map-properties, map-featurecaption, map-coordinates)
+    this._observer = new MutationObserver((mutationList) => {
+      for (let mutation of mutationList) {
+        // the attributes changes of <map-feature> element should be handled by attributeChangedCallback()
+        if (mutation.type === 'attributes' && mutation.target === this) {
+          return;
+        }
+        // re-render feature if there is any observed change
+        this._reRender();
+        delete this._parentEl.bounds;
+      }
+    });
+    this._observer.observe(this, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeOldValue: true,
+      characterData: true
     });
   }
 
@@ -211,45 +239,61 @@ export class MapFeature extends HTMLElement {
     if (this._getFeatureExtent) delete this._getFeatureExtent;
   }
 
+  _createLayer() {
+    // Create a leaflet layer for the map-feature and return
+  }
+
   _addFeature() {
-    this._parentEl.whenReady().then(() => {
-      let parentLayer =
-        this._parentEl.nodeName.toUpperCase() === 'LAYER-'
-          ? this._parentEl
-          : this._parentEl.parentElement || this._parentEl.parentNode.host;
-      this._map = this._layer._map;
-      let mapmlvectors = this._layer._mapmlvectors;
-      // "synchronize" the event handlers between map-feature and <g>
-      if (!this.querySelector('map-geometry')) return;
-      if (!this._linkEl) {
-        let native = this._getNativeZoomAndCS(this._layer._content);
-        this._featureGroup = mapmlvectors.addData(this, native.cs, native.zoom);
-        if (parentLayer.checked) {
+    let parentLayer =
+      this._parentEl.nodeName.toUpperCase() === 'LAYER-'
+        ? this._parentEl
+        : this._parentEl.parentElement || this._parentEl.parentNode.host;
+    //let mapmlvectors = this._layer._mapmlvectors;
+    // "synchronize" the event handlers between map-feature and <g>
+    if (!this.querySelector('map-geometry')) return;
+    // if feature is not a templated feature
+    if (!this._linkEl) {
+      let native = this._getNativeZoomAndCS(
+        parentLayer.shadowRoot ? parentLayer.shadowRoot : parentLayer
+      );
+      // should possibly rename _featureGroup to something more appropriate
+      this._featureGroup = M.featureLayer().addData(
+        this,
+        native.cs,
+        native.zoom
+      );
+
+      // This is where the feature attaches it self to the map,
+      // we will be doing this elsewhere
+
+      /* if (parentLayer.checked) {
           this._featureGroup.addTo(this._map);
         }
         mapmlvectors._layers[this._featureGroup._leaflet_id] =
-          this._featureGroup;
-        if (mapmlvectors._staticFeature && !this._linkEl) {
+          this._featureGroup; */
+      // should be done on the layer- level possibly
+      /* if (mapmlvectors._staticFeature && !this._linkEl) {
           // update zoom bounds of vector layer
-          mapmlvectors.zoomBounds = M.getZoomBounds(
-            this._layer._content,
+          
+          /* mapmlvectors.zoomBounds = M.getZoomBounds(
+            parentLayer,
             this._getNativeZoomAndCS(this._layer._content).zoom
           );
           // todo: dynamically update layer bounds of vector layer
-          mapmlvectors.layerBounds = M.getBounds(this._layer._content);
-          // update map's zoom limit
-          // the mapmlvectors.options should be updated with the new zoomBounds,
-          // to ensure the _addZoomLimit function call can read updated zoom info
-          // and update map zoom limit properly
-          L.extend(mapmlvectors.options, mapmlvectors.zoomBounds);
-          this._map._addZoomLimit(mapmlvectors);
+          mapmlvectors.layerBounds = M.getBounds(this._layer._content); */
+
+      // update map's zoom limit
+      // the mapmlvectors.options should be updated with the new zoomBounds,
+      // to ensure the _addZoomLimit function call can read updated zoom info
+      // and update map zoom limit properly
+      /* L.extend(mapmlvectors.options, mapmlvectors.zoomBounds);
+          this._map._addZoomLimit(mapmlvectors); 
           // TODO: can be set as a handler of featureLayer
           mapmlvectors._resetFeatures();
-        }
-      }
+        } */
+    }
 
-      this._setUpEvents();
-    });
+    this._setUpEvents();
   }
 
   _setUpEvents() {
