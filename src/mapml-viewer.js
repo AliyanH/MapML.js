@@ -6,6 +6,7 @@ import { MapFeature } from './map-feature.js';
 import { MapExtent } from './map-extent.js';
 import { MapInput } from './map-input.js';
 import { MapLink } from './map-link.js';
+import { MapMeta } from './map-meta.js';
 
 export class MapViewer extends HTMLElement {
   static get observedAttributes() {
@@ -1410,3 +1411,4 @@ window.customElements.define('map-feature', MapFeature);
 window.customElements.define('map-extent', MapExtent);
 window.customElements.define('map-input', MapInput);
 window.customElements.define('map-link', MapLink);
+window.customElements.define('map-meta', MapMeta);

@@ -73,63 +73,16 @@
   </head>
   <body>
     
-    <mapml-viewer projection="OSMTILE" zoom="14" lat="45.406314" lon="-75.6883335" controls controlslist="geolocation">
-      <layer- data-testid="osm-layer" label="OpenStreetMap" checked >
-<map-extent data-testid="osm-extent" units="OSMTILE" label="foo" checked="checked" >
-      <map-input name="z" type="zoom" value="18" min="0" max="18"></map-input>
-      <map-input name="x" type="location" units="tilematrix" axis="column" min="0" max="262144"></map-input>
-      <map-input name="y" type="location" units="tilematrix" axis="row" min="0" max="262144"></map-input>
-      <map-link rel="tile" tref="https://tile.openstreetmap.org/{z}/{x}/{y}.png"></map-link>
-    </map-extent>
-      </layer->
-<!--      <layer- data-testid="rest-layer" id="restaurant" label="Mexican restaurants" src="../shared/restaurants/mexican.mapml" checked>-->
-<!--        <map-meta name="cs" content="gcrs" ></map-meta>
-        <map-meta name="extent" content="top-left-easting=-8433179, top-left-northing=5689316, bottom-right-easting=-8420968, bottom-right-northing=5683139"></map-meta>
-        <map-feature zoom="18" id="restaurant_polygon.2" class="restaurant_polygon">
-          <map-featurecaption>Banditos</map-featurecaption>
-            <map-geometry>
-              <map-point>
-                  <map-coordinates>-75.689609 45.405803</map-coordinates>
-              </map-point>
-            </map-geometry>
-            <map-properties>
-                <table>
-                    <thead>
-                        <tr>
-                            <th role="columnheader" scope="col">Property name</th>
-                            <th role="columnheader" scope="col">Property value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">addr_house</th>
-                            <td itemprop="addr_house">683</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">addr_stree</th>
-                            <td itemprop="addr_stree">Bank Street</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">amenity</th>
-                            <td itemprop="amenity">restaurant</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">building</th>
-                            <td itemprop="building">commercial</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">name</th>
-                            <td itemprop="name">Banditos</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">cuisine</th>
-                            <td itemprop="cuisine">mexican</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </map-properties>
-        </map-feature>-->
-      </layer->
+<mapml-viewer projection="CBMTILE" zoom="4" lat="60.290276586020646" lon="-95.1034243914119" controls="" role="application" class="">
+    <layer- label="CBMT" src="../cbmtile-cbmt.mapml" checked="" hidden=""></layer->
+
+    <layer- label="Layer" checked="">
+    <!--  <map-meta name="extent" content="top-left-longitude=-95.32939510989083, top-left-latitude=54.95318444444595, bottom-right-longitude=-74.12936275452705, bottom-right-latitude=45.03741344926002"></map-meta>-->
+    <map-meta name="extent" content="top-left-longitude=-85.84188153476266, top-left-latitude=54.468439300370626, bottom-right-longitude=-74.97076708940445, bottom-right-latitude=51.762701467449894"></map-meta>
+    <map-meta name="projection" content="CBMTILE"></map-meta>
+    <map-meta name="cs" content="gcrs"></map-meta>
+    <map-feature><map-featurecaption>Layer</map-featurecaption><map-geometry><map-polygon><map-coordinates>-80.13042806079916 44.83410700374114 -79.95936754735965 44.47173340901847 -80.49053861953202 44.5812849356698 -81.32335519302019 45.30551100693765 -81.7427861810468 45.2188971255793 -81.29070017009556 44.64613106395032 -81.78833411745074 44.13545119041311 -81.69368588842849 43.54356839992087 -82.57897802218619 42.90266327313046 -83.13178955515818 42.21972904882409 -82.75370763580302 41.930592674552884 -81.4836054094735 42.59482027554395 -80.68282014401038 42.55266731522195 -80.04794199506156 42.88629927349271 -79.09917855678586 42.85356279280941 -79.03209659685938 43.1269267552116 -79.8947399274762 43.349307034174814 -79.21391016521449 43.76393944956655 -79.3925909950386 44.61432772949419 -80.13042806079916 44.83410700374114</map-coordinates></map-polygon></map-geometry><map-properties>aa</map-properties></map-feature></layer->
+
     </mapml-viewer>
   </body>
 </html>
